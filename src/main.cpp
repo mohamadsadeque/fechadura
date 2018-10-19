@@ -3,7 +3,7 @@
 #include <SaIoTDeviceLib.h>
 
 #define DEBUG true
-#define FECHADURA_PIN D1
+#define FECHADURA_PIN D7
 #define RECONFIGURAPIN D5
 
 //Parametros da conexão
@@ -18,6 +18,7 @@ bool abrindo = false;
 //Funções controladores
 void setReconfigura();
 void setOn(String);
+void blinky(int port, size_t times);
 //Funções conexão
 void callback(char *topic, byte *payload, unsigned int length);
 //Funções padão
@@ -37,12 +38,13 @@ unsigned long lastsend = 0;
 void setup()
 {
 
+  // analogWriteFreq(4);
   fechadura.addController(onOff);
-  analogWriteFreq(4);
   Serial.begin(115200);
   pinMode(RECONFIGURAPIN, INPUT_PULLUP);
   pinMode(FECHADURA_PIN, OUTPUT);
   attachInterrupt(RECONFIGURAPIN, setReconfigura, FALLING);
+
   fechadura.preSetCom(espClient, callback);
   fechadura.startDefault(senha);
 }
@@ -83,13 +85,26 @@ void setOn(String json)
   {
     Serial.println("Abrindo porta...");
     abrindo != abrindo;
-    analogWrite(FECHADURA_PIN, 200);
-    delay(2000);
-    analogWrite(FECHADURA_PIN, 0);
+    blinky(FECHADURA_PIN, 12);
     if(fechadura.reportController(onOff.getKey(), 0)){
       Serial.println("Ok");
     }else{
       Serial.println("Error reportMe");
     }
   }
+}
+void blinky(int port, size_t times){
+  for (size_t i = 0; i < times; i++) {
+    digitalWrite(port, HIGH);
+    delay(100);
+    digitalWrite(port, LOW);
+    delay(150);
+    /* code */
+  }
+
+}
+
+
+void functestemerg(/* arguments */) {
+  int qlqrcoisa;
 }
