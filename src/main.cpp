@@ -103,8 +103,3 @@ void blinky(int port, size_t times){
   }
 
 }
-
-
-void functestemerg(/* arguments */) {
-  int qlqrcoisa;
-}
