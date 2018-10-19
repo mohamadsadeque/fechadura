@@ -96,7 +96,7 @@ void setOn(String json)
 void blinky(int port, size_t times){
   for (size_t i = 0; i < times; i++) {
     digitalWrite(port, HIGH);
-    delay(100);
+    delay(10);
     digitalWrite(port, LOW);
     delay(150);
     /* code */
