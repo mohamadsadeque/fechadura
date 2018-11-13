@@ -5,8 +5,11 @@ SaIoTCom::SaIoTCom(){
 SaIoTCom::SaIoTCom(WiFiClient& espClient){
   mqttClient.setClient(espClient);
 };
-
+boolean SaIoTCom::connected(){
+  return mqttClient.connected();
+}
 boolean SaIoTCom::handleCom(void){
+
   return mqttClient.loop();
 };
 
@@ -14,7 +17,7 @@ String SaIoTCom::getToken(String hostHttp, String user, String password, String 
   if(WiFi.status()== WL_CONNECTED){
     String tokenRecebido;
     HTTPClient http;
-    http.begin(hostHttp); 
+    http.begin(hostHttp);
     http.addHeader("Content-Type","application/json");
     int httpCode = http.POST("{\"email\":\""+user+"\",\"password\":\""+password+"\",\"serial\":\"" + serial + "\"}");   //Send the request
     if(httpCode != 200){
@@ -76,7 +79,7 @@ void SaIoTCom::registerDevice(String serial,String user,String token,String json
         if(!mqttClient.subscribe((serial+keys[i]).c_str())){
           Serial.println("Error subscribe in keys topics");
         }
-      } 
+      }
       //Serial.println(hostReg);
       if(mqttClient.publish(hostReg,jsonConf.c_str())){
           Serial.println("Cadastre o device no SaIoT!");
@@ -89,4 +92,3 @@ void SaIoTCom::registerDevice(String serial,String user,String token,String json
   }
   //#endif
 }
-

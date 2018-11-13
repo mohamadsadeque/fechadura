@@ -130,6 +130,7 @@ void WiFiManager::setupConfigPortal() {
   server->onNotFound (std::bind(&WiFiManager::handleNotFound, this));
   server->begin(); // Web server start
   DEBUG_WM(F("HTTP server started"));
+  interrupts_();
 
 }
 

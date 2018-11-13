@@ -20,7 +20,7 @@ void SaIoTDeviceLib::startDefault(String s)
 };
 void SaIoTDeviceLib::startCom(const char *hostSend, uint16_t portSend, const char *hostTok, const char *hostCd, String pUser)
 {
-  
+
   objCom.setServerPort(hostSend, portSend);
   //wm
   WiFiManager wifi;
@@ -58,6 +58,15 @@ bool SaIoTDeviceLib::reportController(String controllerKey, String value){
 
 bool SaIoTDeviceLib::handleLoop()
 {
+  if(!objCom.connected()){
+    Serial.println("Desconectado do BROKER ERR");
+    String keys[qtdControllers];
+    for (int i = 0; i < qtdControllers; i++)
+    {
+      keys[i] += controllers[i]->getKey();
+    }
+    objCom.registerDevice(serial, email, token, this->getJconf(), POSTDISPOSITIVO, keys, qtdControllers);
+  }
   for (int i = 0; i < qtdSensors; i++)
   {
     if (sensors[i]->getReport())
