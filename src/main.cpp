@@ -1,8 +1,6 @@
 /*
 Projeto para controle da porta de sala
-
 v 1.1
-
 Software:
   Danielly
   Patricio Oliveira
@@ -10,30 +8,29 @@ Software:
 Hardware:
   Wesley Wagner
   Mohamad Sadeque
-
 */
-
-
 
 #include <Arduino.h>
 #include <ArduinoOTA.h>
 #include <ESP8266WiFi.h>
 #include <SaIoTDeviceLib.h>
 
-#define RELE D1
-#define BUTTON  D2
-#define RECONFIGURAPIN D5
-void interrupts_();
+bool stateLED = true;
+const int LED = 12;
+unsigned long int timeLED = 500;
+unsigned long int lastTimeLED = 500;
+
+#define RELE 5
+#define BUTTON  0
+// #define RECONFIGURAPIN 14
 //Parametros da conexão
 WiFiClient espClient;
 
 //Parametros do device
-SaIoTDeviceLib fechadura("ECT-repro", "PRT120418192750", "ricardo@email.com");
+SaIoTDeviceLib fechadura("portaaaaECT,", "portaaaaECT", "ricardo@email.com");
 SaIoTController onOff("{\"key\":\"ON\",\"class\":\"button\",\"tag\":\"ON\"}");
 String senha = "12345678910";
 volatile bool abrindo = false;
-void blinkyButton();
-void interrupts_();
 //Variveis controladores
 volatile bool reconfigura = false;
 volatile long lastTime;
@@ -42,13 +39,15 @@ volatile long interval = 4000;
 volatile unsigned long lastreply = 0;
 volatile unsigned long lastsend = 0;
 volatile unsigned long lastbutton = 0;
-
+volatile bool open = false;
+unsigned long int lastOpen = 0;
+unsigned long int timeRelay = 0;
 
 
 //Funções controladores
 void setReconfigura();
 void setOn(String);
-void blinky(int port);
+void blinky();
 //Funções MQTT
 void callback(char *topic, byte *payload, unsigned int length);
 //Funções padão
@@ -60,7 +59,7 @@ void setupOTA();
 void setup()
 {
   Serial.begin(115200);
-  pinMode(RECONFIGURAPIN, INPUT_PULLUP);
+  // pinMode(RECONFIGURAPIN, INPUT_PULLUP);
   pinMode(BUTTON, INPUT_PULLUP);
   pinMode(RELE, OUTPUT);
   interrupts();
@@ -73,10 +72,20 @@ void setup()
 
 void loop()
 {
+  
   /*Serial.print("leitura butao: ");
   Serial.println(digitalRead(BUTTON));*/
   int tentativa = 0;
   fechadura.handleLoop();
+
+  if (open) {
+    digitalWrite(RELE,HIGH);
+    delay(2000);
+    digitalWrite(RELE,LOW);
+    delay(50);
+    Serial.flush();
+    open = false;
+  }
 
   while (WiFi.status() != WL_CONNECTED) {
     Serial.println("Connection Failed! Rebooting...");
@@ -115,40 +124,18 @@ void setReconfigura()
 
 void setOn(String json)
 {
-  if (!abrindo && (json == "1"))
+  if (json == "1" && (((millis() - lastOpen) >= 2250 )))
   {
-    Serial.println("Abrindo porta...");
-    abrindo != abrindo;
-    blinky(RELE);
-    if(fechadura.reportController(onOff.getKey(), 0)){
-      Serial.println("Ok");
-    }else{
-      Serial.println("Error reportMe");
+    lastOpen = millis();
+    open = true;
+  }
     }
-  }else {
-      digitalWrite(RELE, LOW);
-  }
-}
+  
 
-void blinky(int port){
-  for (size_t i = 0; i < 5; i++) {
-    digitalWrite(port, HIGH);
-    delay(50);
-    digitalWrite(port, LOW);
-    delay(50);
-  }
-}
-void blinkyButton(){
-  if ((millis() - lastbutton) >= 200) {
-    Serial.println("botão");
-    blinky(RELE);
-    Serial.flush();
-    lastbutton = millis();
-  }
-}
 
 
 void setupOTA(){
+
   ArduinoOTA.onStart([]() {
     String type;
     if (ArduinoOTA.getCommand() == U_FLASH) {
@@ -163,10 +150,11 @@ void setupOTA(){
   ArduinoOTA.onEnd([]() {
     Serial.println("\nEnd");
   });
+
   ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
     Serial.printf("Progress: %u%%\r", (progress / (total / 100)));
-  });attachInterrupt(RECONFIGURAPIN, setReconfigura, FALLING);
-  attachInterrupt(BUTTON, blinkyButton, FALLING);
+  });
+  
   ArduinoOTA.onError([](ota_error_t error) {
     Serial.printf("Error[%u]: ", error);
     if (error == OTA_AUTH_ERROR) {
@@ -184,13 +172,13 @@ void setupOTA(){
   ArduinoOTA.begin();
 }
 
-
+/*
 void interrupts_(){
-  attachInterrupt(digitalPinToInterrupt(RECONFIGURAPIN), setReconfigura, FALLING);
+   attachInterrupt(digitalPinToInterrupt(RECONFIGURAPIN), setReconfigura, FALLING);
   attachInterrupt(digitalPinToInterrupt(BUTTON), blinkyButton, FALLING);
 }
-//
-// void detachInterrupt_(){
-//   detachInterrupt(digitalPinToInterrupt(RECONFIGURAPIN));
-//   deAttachInterrupt(digitalPinToInterrupt(BUTTON));
-// }
+
+ void detachInterrupt_(){
+ detachInterrupt(digitalPinToInterrupt(RECONFIGURAPIN));
+   deAttachInterrupt(digitalPinToInterrupt(BUTTON));
+}*/
