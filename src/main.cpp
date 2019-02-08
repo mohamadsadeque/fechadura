@@ -75,7 +75,6 @@ void loop()
   
   /*Serial.print("leitura butao: ");
   Serial.println(digitalRead(BUTTON));*/
-  int tentativa = 0;
   fechadura.handleLoop();
 
   if (open) {
@@ -85,14 +84,6 @@ void loop()
     delay(50);
     Serial.flush();
     open = false;
-  }
-
-  while (WiFi.status() != WL_CONNECTED) {
-    Serial.println("Connection Failed! Rebooting...");
-    delay(500);
-    if (++tentativa>=5) {
-      ESP.restart();
-    }
   }
   Serial.flush();
 }
