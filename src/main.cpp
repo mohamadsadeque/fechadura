@@ -30,7 +30,7 @@ WiFiClient espClient;
 SaIoTDeviceLib fechadura("portaaaaECT,", "portaaaaECT", "ricardo@email.com");
 SaIoTController onOff("{\"key\":\"ON\",\"class\":\"button\",\"tag\":\"ON\"}");
 String senha = "12345678910";
-volatile bool abrindo = false;
+volatile bool abrindo = true;
 //Variveis controladores
 volatile bool reconfigura = false;
 volatile long lastTime;
@@ -41,8 +41,8 @@ volatile unsigned long lastsend = 0;
 volatile unsigned long lastbutton = 0;
 volatile bool open = false;
 unsigned long int lastOpen = 0;
-unsigned long int timeRelay = 0;
-
+unsigned long int delayOpen =0;
+int estado = 0;
 
 //Funções controladores
 void setReconfigura();
@@ -72,20 +72,19 @@ void setup()
 
 void loop()
 {
-  
-  /*Serial.print("leitura butao: ");
-  Serial.println(digitalRead(BUTTON));*/
-  fechadura.handleLoop();
 
-  if (open) {
-    digitalWrite(RELE,HIGH);
-    delay(2000);
-    digitalWrite(RELE,LOW);
-    delay(50);
-    Serial.flush();
-    open = false;
-  }
-  Serial.flush();
+fechadura.handleLoop();
+
+if(estado == 1){
+  digitalWrite(RELE,HIGH);
+  delayOpen = millis();
+  estado = 2;
+}
+else if(estado == 2 && (millis() - delayOpen) >= 2000){
+  digitalWrite(RELE,LOW);
+  estado = 0;
+}
+
 }
 
 void callback(char *topic, byte *payload, unsigned int length)
@@ -118,7 +117,7 @@ void setOn(String json)
   if (json == "1" && (((millis() - lastOpen) >= 2250 )))
   {
     lastOpen = millis();
-    open = true;
+    estado = 1;
   }
     }
   
