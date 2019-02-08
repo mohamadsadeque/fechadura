@@ -27,7 +27,7 @@ unsigned long int lastTimeLED = 500;
 WiFiClient espClient;
 
 //Parametros do device
-SaIoTDeviceLib fechadura("portaaaaECT,", "portaaaaECT", "ricardo@email.com");
+SaIoTDeviceLib fechadura("AlgumaPorta", "AlgumaPorta", "ricardo@email.com");
 SaIoTController onOff("{\"key\":\"ON\",\"class\":\"button\",\"tag\":\"ON\"}");
 String senha = "12345678910";
 volatile bool abrindo = true;
