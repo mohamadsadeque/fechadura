@@ -17,8 +17,6 @@ Hardware:
 
 bool stateLED = true;
 const int LED = 12;
-unsigned long int timeLED = 500;
-unsigned long int lastTimeLED = 500;
 
 #define RELE 5
 #define BUTTON  0
@@ -27,7 +25,7 @@ unsigned long int lastTimeLED = 500;
 WiFiClient espClient;
 
 //Parametros do device
-SaIoTDeviceLib fechadura("AlgumaPorta", "AlgumaPorta", "ricardo@email.com");
+SaIoTDeviceLib fechadura("AlgumaPorta2", "AlgumaPorta2", "ricardo@email.com");
 SaIoTController onOff("{\"key\":\"ON\",\"class\":\"button\",\"tag\":\"ON\"}");
 String senha = "12345678910";
 volatile bool abrindo = true;
@@ -62,11 +60,10 @@ void setup()
   // pinMode(RECONFIGURAPIN, INPUT_PULLUP);
   pinMode(BUTTON, INPUT_PULLUP);
   pinMode(RELE, OUTPUT);
-  interrupts();
   delay(80);
   fechadura.addController(onOff);
-  fechadura.preSetCom(espClient, callback);
-  fechadura.startDefault(senha);
+  fechadura.preSetCom(espClient, callback, 300);
+  fechadura.start(senha);
   setupOTA();
 }
 

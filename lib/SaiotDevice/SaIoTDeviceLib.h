@@ -35,12 +35,15 @@ private:
   SaIoTController *controllers[maxControllers];
   SaIoTCom objCom;
 
+  int tryConnection(unsigned long timeOutSeconds);
+
 public:
   SaIoTDeviceLib();
   SaIoTDeviceLib(String _name, String _serial, String _email);
 
   void preSetCom(WiFiClient &, fptr _function);
-  void startDefault(String s);
+  void preSetCom(WiFiClient &, fptr _function,unsigned long timeOutSeconds);
+  void start(String s);
   void startCom(const char *hostSend, uint16_t portSend, const char *hostTok, const char *hostCd, String pUser); //poderia ser setParams e só depois o Start
   void setToken(String _token);
   void setEmail(String _email);
