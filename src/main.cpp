@@ -25,7 +25,7 @@ const int LED = 12;
 WiFiClient espClient;
 
 //Parametros do device
-SaIoTDeviceLib fechadura("AlgumaPorta2", "AlgumaPorta2", "ricardo@email.com");
+SaIoTDeviceLib fechadura("AlgumaPorta1", "AlgumaPorta1", "ricardo@email.com");
 SaIoTController onOff("{\"key\":\"ON\",\"class\":\"button\",\"tag\":\"ON\"}");
 String senha = "12345678910";
 volatile bool abrindo = true;
